@@ -20,23 +20,27 @@ final class UserServiceTest extends KernelTestCase
     /**
      * @var UserService Сервис пользователей.
      */
-    private $service;
+    private static $service;
+
     /**
      * @var EntityManager Entity manager.
      */
     private static $entityManager;
+
     /**
      * @var TokenStorage Хранилище токенов.
      */
-    private $tokenStorage;
+    private static $tokenStorage;
+
     /**
      * @var ContainerInterface DI контэйнер.
      */
     private static $kernelContainer;
+
     /**
      * @var UserPasswordEncoder Энкодер паролей.
      */
-    private $passwordEncoder;
+    private static $passwordEncoder;
 
     /**
      * @inheritDoc
@@ -47,18 +51,11 @@ final class UserServiceTest extends KernelTestCase
         $kernel = self::bootKernel();
         self::$kernelContainer = $kernel->getContainer();
         self::$entityManager = self::$kernelContainer->get('doctrine')->getManager();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function setUp(): void
-    {
         $encoder = new NativePasswordEncoder(null, null, PASSWORD_BCRYPT_DEFAULT_COST, PASSWORD_BCRYPT);
         $encoderFactory = new EncoderFactory(['App\Entity\User' => $encoder]);
-        $this->passwordEncoder = new UserPasswordEncoder($encoderFactory);
-        $this->tokenStorage = new TokenStorage();
-        $this->service = new UserService(self::$entityManager, $this->passwordEncoder, $this->tokenStorage);
+        self::$passwordEncoder = new UserPasswordEncoder($encoderFactory);
+        self::$tokenStorage = new TokenStorage();
+        self::$service = new UserService(self::$entityManager, self::$passwordEncoder, self::$tokenStorage);
     }
 
     /**
@@ -67,12 +64,12 @@ final class UserServiceTest extends KernelTestCase
     public function testGetCurrentUser()
     {
         $user = new User('123');
-        $user->setPassword($this->passwordEncoder->encodePassword($user, '123'));
+        $user->setPassword(self::$passwordEncoder->encodePassword($user, '123'));
         $jwtManager = self::$kernelContainer->get('lexik_jwt_authentication.jwt_manager');
         $tokenRaw = $jwtManager->create($user);
         $token = new JWTUserToken([], $user, $tokenRaw);
-        $this->tokenStorage->setToken($token);
-        $tokenUser = $this->service->getCurrentUser();
+        self::$tokenStorage->setToken($token);
+        $tokenUser = self::$service->getCurrentUser();
         $this->assertInstanceOf('App\Entity\User', $tokenUser);
         $this->assertEquals($user, $tokenUser);
     }
@@ -84,7 +81,7 @@ final class UserServiceTest extends KernelTestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Не удалось создать пользователя. Не задан обязательный параметр `username`.');
-        $this->service->createUser('', 'test');
+        self::$service->createUser('', 'test');
     }
 
     /**
@@ -94,7 +91,7 @@ final class UserServiceTest extends KernelTestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Не удалось создать пользователя. Не задан обязательный параметр `password`.');
-        $this->service->createUser('test', '');
+        self::$service->createUser('test', '');
     }
 
     /**
@@ -104,7 +101,7 @@ final class UserServiceTest extends KernelTestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Не удалось проверить наличие пользователя. Не задан обязательный параметр `username`.');
-        $this->service->hasUser('');
+        self::$service->hasUser('');
     }
 
     /**
@@ -112,7 +109,7 @@ final class UserServiceTest extends KernelTestCase
      */
     public function testCreateUser()
     {
-        $user = $this->service->createUser('123', '123');
+        $user = self::$service->createUser('123', '123');
         $this->assertInstanceOf('App\Entity\User', $user);
 
         return $user;
@@ -127,18 +124,7 @@ final class UserServiceTest extends KernelTestCase
      */
     public function testHasUser(User $user)
     {
-        $this->assertTrue($this->service->hasUser($user->getUsername()));
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        $this->tokenStorage = null;
-        $this->passwordEncoder = null;
-        $this->service = null;
+        $this->assertTrue(self::$service->hasUser($user->getUsername()));
     }
 
     /**
@@ -152,5 +138,8 @@ final class UserServiceTest extends KernelTestCase
         self::$entityManager->getConnection()->exec("DELETE FROM user WHERE username = '123';");
         self::$entityManager->close();
         self::$entityManager = null;
+        self::$tokenStorage = null;
+        self::$passwordEncoder = null;
+        self::$service = null;
     }
 }

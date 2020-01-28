@@ -208,7 +208,7 @@ final class LinksService
         $link = $this->linkRepository->findOneBy(['code' => $code]);
 
         if (!$link) {
-            throw new LinkNotFoundException("Ссылка с кодом равным $code не найдена.");
+            throw new LinkNotFoundException("Ссылка с кодом равным `$code` не найдена.");
         }
 
         return $link;
