@@ -10,3 +10,4 @@
 - `symfony server:start`
 
 ### тесты:
+- `php vendor/bin/phpunit`
