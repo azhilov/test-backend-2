@@ -1,0 +1,438 @@
+openapi: 3.0.0
+info:
+  title: Test Backend 2
+  description: Test Backend 2.
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:8000
+    description: Test server
+paths:
+  /api/link:
+    post:
+      summary: "Создание короткой ссылк"
+      tags:
+        - "link"
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/CreateUpdateLinkParams"
+      responses:
+        200:
+          description: 'Ссылка успешно создана'
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/CreateLinkResponse"
+        400:
+          description: "Некорректно заданы параметры"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+        401:
+          description: "Необходима авторизация"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+        500:
+          description: "Другие ошибки"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+      security:
+      - bearerAuth: []
+  /api/link/{id}:
+    get:
+      summary: "Получение ссылки по ИД"
+      tags:
+        - "link"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ИД ссылки"
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+      responses:
+        200:
+          description: 'Ссылка успешно получена'
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Link"
+        400:
+          description: "Некорректно заданы параметры"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+        404:
+          description: "Ссылка не найдена"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+        500:
+          description: "Другие ошибки"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+      security:
+        - JWT: []
+    put:
+      summary: "Обновление короткой ссылки"
+      operationId: "updateLink"
+      tags:
+        - "link"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ИД ссылки"
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/CreateUpdateLinkParams"
+      responses:
+        200:
+          description: 'Ссылка успешно обновлена'
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+        400:
+          description: "Некорректно заданы параметры"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+        404:
+          description: "Ссылка не найдена"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+        500:
+          description: "Другие ошибки"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+      security:
+        - JWT: []
+    delete:
+      summary: "Удаление ссылки по ИД"
+      tags:
+        - "link"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ИД ссылки"
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+      responses:
+        200:
+          description: 'Ссылка успешно удалена'
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Link"
+        400:
+          description: "Некорректно заданы параметры"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+        404:
+          description: "Ссылка не найдена"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+        500:
+          description: "Другие ошибки"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+      security:
+        - JWT: []
+  /{code}:
+    get:
+      tags:
+        - "link"
+      summary: "Переход по короткой ссылке"
+      operationId: "goToLink"
+      parameters:
+        - name: "code"
+          in: path
+          required: true
+          description: "Код ссылки"
+          schema:
+            type : string
+      responses:
+        301:
+          description: "Редирект на полную ссылку"
+        400:
+          description: "Некорректно заданы параметры"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+        404:
+          description: "Ссылка не найдена"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+        500:
+          description: "Другие ошибки"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+  /api/links/category/{category}:
+    get:
+      tags:
+      - "link"
+      summary: "Получение ссылок определённой категории"
+      parameters:
+        - name: "category"
+          in: "path"
+          description: "Категория ссылки"
+          required: true
+          schema:
+            type : string
+      responses:
+        200:
+          description: "Успешное выполнение"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/GetLinksResponse"
+        400:
+          description: "Некорректно заданы параметры"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+        500:
+          description: "Другие ошибки"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+      security:
+        - JWT: []
+  /api/links/all:
+    get:
+      tags:
+      - "link"
+      summary: "Получение всех ссылок пользоватлея"
+      responses:
+        200:
+          description: "Успешное выполнение"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/GetLinksResponse"
+        400:
+          description: "Некорректно заданы параметры"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+        500:
+          description: "Другие ошибки"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+      security:
+        - JWT: []
+  /register:
+    post:
+      tags:
+      - "auth"
+      summary: "Регистрация пользователя"
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UserCredentials"
+      responses:
+        200:
+          description: "Успешное выполнение"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/NewUserResponse"
+        400:
+          description: "Некорректно заданы параметры"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+        500:
+          description: "Другие ошибки"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+  /login_check:
+    post:
+      tags:
+      - "auth"
+      summary: "Получение токена"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCredentials"
+      responses:
+        200:
+          description: "Успешное выполнение"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/NewTokenResponse"
+        401:
+          description: "Некорректно заданы параметры"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+        500:
+          description: "Другие ошибки"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Response"
+components:
+  schemas:
+    Response:
+      type: object
+      properties:
+        code:
+          description: "HTTP код"
+          type: integer
+        message:
+          description: "Сообщение"
+          type: string
+    CreateUpdateLinkParams:
+      type: object
+      properties:
+        url:
+          description: "Полный адрес ссылки"
+          type: string
+        category:
+          description: "Категория ссылки"
+          type: string
+    UserCredentials:
+      type: object
+      properties:
+        username:
+          description: "Имя пользователя"
+          type: string
+        password:
+          description: "Пароль пользователя"
+          type: string
+    NewUserResponse:
+      type: object
+      properties:
+        newUserId:
+          description: "ИД нового пользователя"
+          type: integer
+    NewTokenResponse:
+      type: object
+      properties:
+        token:
+          description: "Новый токен"
+          type: string
+    CreateLinkResponse:
+      type: object
+      properties:
+        code:
+          description: "HTTP код"
+          type: integer
+        message:
+          description: "Сообщение"
+          type: string
+        data:
+          description: "Данные о созданной записи"
+          type: object
+          properties:
+            id:
+              description: "ИД созданной записи"
+              type: integer
+            shortUrl:
+              description: "Коротка ссылка"
+              type: string
+    GetLinksResponse:
+      type: object
+      properties:
+        code:
+          description: "HTTP код"
+          type: integer
+        message:
+          description: "Сообщение"
+          type: string
+        data:
+          description: "Данные о ссылках"
+          type: object
+          properties:
+            links:
+              description: "Ссылки"
+              type: array
+              items: 
+                $ref: "#/components/schemas/Link"
+    Link:
+      type: object
+      properties:
+        id:
+          description: "ИД ссылки"
+          type: integer
+        url:
+          description: "Полный адрес ссылки"
+          type: string
+        code:
+          description: "Код ссылки"
+          type: string
+        shortUrl:
+          description: "Адрес короткой ссылки"
+          type: string
+        category:
+          description: "Категория ссылки"
+          type: string
+        counter:
+          description: "Счетчик посещений"
+          type: integer
+        updatedAt:
+          description: "Дата последнего обновления"
+          type: string
+        userId:
+          description: "ИД пользователя"
+          type: integer
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
