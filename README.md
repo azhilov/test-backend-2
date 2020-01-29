@@ -12,3 +12,6 @@
 
 ### тесты:
 - `php vendor/bin/phpunit`
+
+### документация:
+- в файле **openapi.yaml**
