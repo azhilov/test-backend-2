@@ -22,7 +22,7 @@ class AuthController extends AbstractController
     /**
      * @var UserService Сервис пользователей.
      */
-    private $userService;
+    private UserService $userService;
 
     /**
      * Конструктор класса.
