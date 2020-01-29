@@ -25,6 +25,10 @@ class LinkController extends AbstractController
      * @var LinksService Сервис ссылок.
      */
     private $linkService;
+
+    /**
+     * @var UserService Сервис пользователей.
+     */
     private $userService;
 
     /**
@@ -85,7 +89,7 @@ class LinkController extends AbstractController
 
         return $this->json([
             'code' => Response::HTTP_OK,
-            'message' => 'Короткая ссылка успешно создана.',
+            'message' => 'Короткаяссылка успешно создана.',
             'data' => [
                 'id' => $newLink->getId(),
                 'shortUrl' => $newLink->getShortUrl()
