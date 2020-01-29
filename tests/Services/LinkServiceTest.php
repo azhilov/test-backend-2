@@ -78,10 +78,10 @@ final class LinkServiceTest extends KernelTestCase
      */
     public function testUpdateLink(Link $link)
     {
-        self::$service->update($link->getId(), 'https://www.youtube.com', 'video');
+        self::$service->update($link->getId(), 'https://www.youtube.com', 'test');
         $updatedLink = self::$service->getById($link->getId());
         $this->assertEquals('https://www.youtube.com', $updatedLink->getUrl());
-        $this->assertEquals('video', $updatedLink->getCategory());
+        $this->assertEquals('test', $updatedLink->getCategory());
 
         return $updatedLink;
     }
@@ -161,11 +161,11 @@ final class LinkServiceTest extends KernelTestCase
      */
     public function testGetAllLinksByCategory(Link $link)
     {
-        $links = self::$service->getByCategory('video');
+        $links = self::$service->getByCategory('test');
         $this->assertIsArray($links);
         $this->assertEquals($links, [$link]);
         $this->assertCount(1, $links);
-        $this->assertEquals('video', $links[0]->getCategory());
+        $this->assertEquals('test', $links[0]->getCategory());
     }
 
     /**
@@ -325,7 +325,7 @@ final class LinkServiceTest extends KernelTestCase
     public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
-        self::$entityManager->getConnection()->exec("DELETE FROM links WHERE category = 'video';");
+        self::$entityManager->getConnection()->exec("DELETE FROM links WHERE category = 'test';");
         self::$entityManager->getConnection()->exec("DELETE FROM user WHERE username = '123';");
         self::$entityManager->close();
         self::$entityManager = null;
